@@ -9,7 +9,7 @@ class CustomerModels(models.Model):
      DELETE_CHOICE=((LIVE,'live'),(DELETE,'Delete'))
      name=models.CharField(max_length=100)
      address=models.CharField(max_length=200)
-     image=models.ImageField(upload_to='media/productimage')
+     image=models.ImageField(upload_to='media/userimage')
      user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='coustomer_profile')
      phone=models.CharField(default="none")
      delete_status=models.IntegerField(choices=DELETE_CHOICE,default=LIVE)
