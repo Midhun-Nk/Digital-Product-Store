@@ -20,9 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 urlpatterns = [
-    path('', views.index),
+    path('', views.index,name='Home'),
         path('products', views.list_product,name='products'),
-                path('product_details', views.detail_product,name='product_details')
+                path('product_details/<pk>', views.detail_product,name='product_details')
 
 
 ]

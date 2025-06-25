@@ -3,15 +3,20 @@ from .models import ProductModels
 from django.core.paginator import Paginator
 
 def index(request):
-    return render(request, 'index.html')
+    featured_product = ProductModels.objects.order_by('priority')[:4]
+    latest_product = ProductModels.objects.order_by('-id')[:4]
+    context = {
+        'featured_products': featured_product,
+        'latest_products': latest_product
+    }
+    return render(request, 'index.html', context)
 
 def list_product(request):
-    products_list = ProductModels.objects.all()
-    product_paginator = Paginator(products_list, 2)  # Show 8 per page
+    products_list = ProductModels.objects.order_by('-priority')
+    product_paginator = Paginator(products_list, 2)  # 2 products per page
     page = request.GET.get('page', 1)
     page_obj = product_paginator.get_page(page)
 
-    # Manual chunking logic (4 per row)
     def chunk_products(products, size):
         return [products[i:i + size] for i in range(0, len(products), size)]
 
@@ -23,6 +28,7 @@ def list_product(request):
     }
     return render(request, 'products.html', context)
 
-def detail_product(request, product_id):
-    product = get_object_or_404(ProductModels, id=product_id)
-    return render(request, 'product_details.html', {'product': product})
+def detail_product(request, pk):
+    product = get_object_or_404(ProductModels, pk=pk)
+    context = {'product': product}
+    return render(request, 'product_details.html', context)
