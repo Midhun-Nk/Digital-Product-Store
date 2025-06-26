@@ -1,78 +1,72 @@
-
 {% load static %}
 
-
 <div class="small-container cart-page">
-        <table>
-            <tbody><tr>
+    <table>
+        <thead>
+            <tr>
                 <th>Product</th>
                 <th>Quantity</th>
                 <th>Subtotal</th>
             </tr>
+        </thead>
+        <tbody>
+            {% for entry in items %}
             <tr>
                 <td>
                     <div class="cart-info">
-                        <img src="{% static 'images/buy-1.jpg' %}' %}">
+                        <img src="{{ entry.item.product.image.url }}" alt="{{ entry.item.product.title }}" />
                         <div>
-                            <p>Red Printed T-Shirt</p>
-                            <small>Price: $50.00</small>
-                            <br>
-                            <a href="">Remove</a>
+                            <p>{{ entry.item.product.title }}</p>
+                            <small>Price: ₹{{ entry.item.product.price }}</small><br>
+
+                            <!-- 🗑️ Remove Button -->
+                            <form method="POST" action="{% url 'remove_cart_item' entry.item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" style="color: red; background: none; border: none; cursor: pointer;">Remove</button>
+                            </form>
                         </div>
                     </div>
                 </td>
-                <td><input type="number" value="1"></td>
-                <td>$50.00</td>
+
+                <!-- ➕➖ Quantity Update Buttons -->
+                <td>
+                    <form method="POST" action="{% url 'update_cart_quantity' entry.item.id %}" style="display: flex; align-items: center; gap: 5px;">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="decrease" style="padding: 2px 8px;">−</button>
+                        <input type="number" name="quantity" value="{{ entry.item.quantity }}" min="1" readonly style="width: 40px; text-align: center;">
+                        <button type="submit" name="action" value="increase" style="padding: 2px 8px;">+</button>
+                    </form>
+                </td>
+
+                <!-- 💰 Subtotal -->
+                <td>₹{{ entry.subtotal }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Your cart is empty.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- 💵 Totals Section -->
+    <div class="total-price">
+        <table>
+            <tr>
+                <td>Subtotal</td>
+                <td>₹{{ subtotal }}</td>
             </tr>
             <tr>
-                <td>
-                    <div class="cart-info">
-                        <img src="{% static 'images/buy-2.jpg' %}">
-                        <div>
-                            <p>Red Printed T-Shirt</p>
-                            <small>Price: $50.00</small>
-                            <br>
-                            <a href="">Remove</a>
-                        </div>
-                    </div>
-                </td>
-                <td><input type="number" value="1"></td>
-                <td>$50.00</td>
+                <td>Tax</td>
+                <td>₹{{ tax|floatformat:2 }}</td>
             </tr>
             <tr>
-                <td>
-                    <div class="cart-info">
-                        <img src="{% static 'images/buy-3.jpg' %}">
-                        <div>
-                            <p>Red Printed T-Shirt</p>
-                            <small>Price: $50.00</small>
-                            <br>
-                            <a href="">Remove</a>
-                        </div>
-                    </div>
-                </td>
-                <td><input type="number" value="1"></td>
-                <td>$50.00</td>
+                <td>Total</td>
+                <td>₹{{ total|floatformat:2 }}</td>
             </tr>
-        </tbody></table>
-        <div class="total-price">
-            <table>
-                <tbody><tr>
-                    <td>Subtotal</td>
-                    <td>$200.00</td>
-                </tr>
-                <tr>
-                    <td>Tax</td>
-                    <td>$35.00</td>
-                </tr>
-                <tr>
-                    <td>Total</td>
-                    <td>$230.00</td>
-                </tr>
-                <tr>
-                    <td colspan="2"></td><td><button>Confrim</button></td>
-                </tr>
-            </tbody></table>
-        </div>
-        
+            <tr>
+                <td colspan="2" style="text-align:right;">
+                    <button>Confirm</button>
+                </td>
+            </tr>
+        </table>
     </div>
+</div>

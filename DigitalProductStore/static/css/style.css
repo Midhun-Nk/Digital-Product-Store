@@ -499,3 +499,25 @@ form a{
         display: none;
     }
 }
+
+.cart-quantity-form {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cart-quantity-input {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    padding: 6px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #000;
+}
+
+.cart-quantity-button {
+    padding: 4px 10px;
+    font-size: 16px;
+}
