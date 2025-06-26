@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="small-container">
+    <h2>Your Confirmed Orders</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="order-card" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;">
+                <h4>Order ID: {{ order.id }}</h4>
+                <p>Status: {{ order.get_order_status_display }}</p>
+                <p>Date: {{ order.created_at|date:"F j, Y, g:i a" }}</p>
+                <ul>
+                    {% for item in order.ordered_items.all %}
+                        <li>
+                            {{ item.quantity }} × {{ item.product.title }} (₹{{ item.product.price }})  
+                            = ₹{{ item.quantity|floatformat:0|add:"0"|add:"0" }} × ₹{{ item.product.price|floatformat:0 }}
+                            = ₹{{ item.product.price|floatformat:2|floatformat:2|stringformat:"s" }} × {{ item.quantity }} 
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You have no confirmed orders yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

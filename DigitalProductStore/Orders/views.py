@@ -102,3 +102,24 @@ def remove_cart_item(request, item_id):
     item = get_object_or_404(OrderItem, id=item_id, owner__owner__user=request.user)
     item.delete()
     return redirect('view_cart')
+
+
+@login_required
+def confirmed_orders(request):
+    customer = request.user.customer_profile
+    orders = Order.objects.filter(owner=customer, order_status=Order.ORDER_CONFIRMED, delete_status=Order.LIVE)
+    return render(request, 'confirmed_orders.html', {'orders': orders})
+
+@require_POST
+@login_required
+def confirm_order(request):
+    customer = request.user.customer_profile
+    try:
+        # Get the active cart order
+        order = Order.objects.get(owner=customer, order_status=Order.CART_STAGE, delete_status=Order.LIVE)
+        # Confirm the order
+        order.order_status = Order.ORDER_CONFIRMED
+        order.save()
+    except Order.DoesNotExist:
+        pass  # Optionally handle case where no active cart exists
+    return redirect('confirmed_orders')

@@ -42,7 +42,9 @@
                 <td>₹{{ entry.subtotal }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="3">Your cart is empty.</td></tr>
+            <tr>
+                <td colspan="3">Your cart is empty.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -64,7 +66,10 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:right;">
-                    <button>Confirm</button>
+                    <form method="POST" action="{% url 'confirm_order' %}">
+                        {% csrf_token %}
+                        <button class="btn" type="submit">Confirm</button>
+                    </form>
                 </td>
             </tr>
         </table>
