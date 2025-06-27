@@ -7,6 +7,7 @@ from django.contrib import messages
 
 from .models import CustomerModels
 from .models import SellerModels  # ✅ Import your seller model
+from Products.models import ProductModels
 
 
 def user_logout(request):
@@ -87,3 +88,35 @@ def seller_panel(request):
 @login_required
 def seller_dashboard(request):
     return render(request, 'seller_dashboard.html')
+
+
+@login_required
+def add_product(request):
+    if not hasattr(request.user, 'seller_profile'):
+        messages.error(request, "You must become a seller first.")
+        return redirect('seller_panel')
+
+    if request.method == "POST":
+        try:
+            title = request.POST['title']
+            price = float(request.POST['price'])
+            description = request.POST['description']
+            category = request.POST['category']
+            priority = int(request.POST.get('priority', 0))
+            image = request.FILES['image']
+
+            ProductModels.objects.create(
+                title=title,
+                price=price,
+                description=description,
+                category=category,
+                priority=priority,
+                image=image,
+                seller=request.user.seller_profile
+            )
+
+            return render(request, 'add_product.html', {'success': "Product added successfully!"})
+        except Exception as e:
+            return render(request, 'add_product.html', {'error': str(e)})
+
+    return render(request, 'add_product.html')

@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="small-container" style="max-width: 600px; margin: 40px auto">
+  <h2>Add New Product</h2>
+
+  {% if error %}
+  <p style="color: red">{{ error }}</p>
+  {% endif %} {% if success %}
+  <p style="color: green">{{ success }}</p>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Title:</label><br />
+    <input type="text" name="title" required /><br /><br />
+
+    <label>Price:</label><br />
+    <input type="number" step="0.01" name="price" required /><br /><br />
+
+    <label>Description:</label><br />
+    <input type="text" name="description" required /><br /><br />
+
+    <label>Category:</label><br />
+    <input type="text" name="category" required /><br /><br />
+
+    <label>Priority:</label><br />
+    <input type="number" name="priority" value="0" /><br /><br />
+
+    <label>Image:</label><br />
+    <input type="file" name="image" required /><br /><br />
+
+    <button type="submit" class="btn">Add Product</button>
+  </form>
+</div>
+{% endblock %}

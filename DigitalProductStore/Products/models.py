@@ -13,7 +13,7 @@ class ProductModels(models.Model):
      category=models.CharField(max_length=100)
      priority=models.IntegerField(default=0)
      delete_status=models.IntegerField(choices=DELETE_CHOICE,default=LIVE)
-     created_at=models.DateTimeField(auto_created=True)
+     created_at=models.DateTimeField(auto_now_add=True)
      updated_at=models.DateTimeField(auto_now=True)
      seller = models.ForeignKey(SellerModels, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
 
