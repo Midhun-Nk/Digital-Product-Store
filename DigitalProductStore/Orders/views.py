@@ -5,6 +5,12 @@ from Customers.models import CustomerModels
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
+from django.core.mail import send_mail
+from django.conf import settings
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from decouple import config
+
 @login_required
 def add_to_cart(request):
     if request.method == 'POST':
@@ -117,9 +123,124 @@ def confirm_order(request):
     try:
         # Get the active cart order
         order = Order.objects.get(owner=customer, order_status=Order.CART_STAGE, delete_status=Order.LIVE)
+
         # Confirm the order
         order.order_status = Order.ORDER_CONFIRMED
         order.save()
+
+        # Prepare download links
+        product_links = []
+        for item in order.ordered_items.select_related('product'):
+            if item.product and item.product.url:
+                product_links.append(
+                    f"<li><strong>{item.product.title}:</strong> <a href='{item.product.url}'>{item.product.url}</a></li>"
+                )
+
+                # Compose email HTML content
+                html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <style>
+            body {{
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f9fc;
+            padding: 40px 20px;
+            color: #333;
+            }}
+            .container {{
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            }}
+            .header {{
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            }}
+            .header h1 {{
+            color: #2c3e50;
+            }}
+            .product {{
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            }}
+            .product h3 {{
+            margin: 0 0 10px 0;
+            color: #007bff;
+            }}
+            .footer {{
+            margin-top: 40px;
+            font-size: 14px;
+            color: #555;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            text-align: center;
+            }}
+            a {{
+            color: #1a73e8;
+            }}
+        </style>
+        </head>
+        <body>
+        <div class="container">
+            <div class="header">
+            <h1>🎉 Thanks for your Purchase!</h1>
+            <p>Your digital products are ready for download below.</p>
+            </div>
+        """
+
+        # Add product blocks
+        for item in order.ordered_items.select_related('product'):
+            product = item.product
+            if product:
+                html_content += f"""
+                <div class="product">
+                <h3>{product.title}</h3>
+                <p><strong>Price:</strong> ₹{product.price}</p>
+                <p><strong>Description:</strong> {product.description}</p>
+                <p><strong>Category:</strong> {product.category}</p>
+                <p><strong>Quantity Ordered:</strong> {item.quantity}</p>
+                <p><strong>Download Link:</strong> <a href="{product.url}">{product.url}</a></p>
+                </div>
+                """
+
+        # Close HTML
+        html_content += """
+            <div class="footer">
+            <p>If you have any questions, reply to this email or contact support.</p>
+            <p>💼 DigitalProductStore<br>📧 midhunnk2019@gmail.com</p>
+            </div>
+        </div>
+        </body>
+        </html>
+        """
+
+
+
+               # Send the email
+        message = Mail(
+            from_email=config('DEFAULT_FROM_EMAIL'),
+            to_emails=request.user.email,
+            subject='Your Digital Product Download Links',
+            html_content=html_content
+        )
+
+        SENDGRID_API_KEY = config('SENDGRID_API_KEY')
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        print("SendGrid response status:", response.status_code)
+
+
     except Order.DoesNotExist:
-        pass  # Optionally handle case where no active cart exists
+        pass
+    except Exception as e:
+        print("SendGrid error:", e)
+
     return redirect('confirmed_orders')

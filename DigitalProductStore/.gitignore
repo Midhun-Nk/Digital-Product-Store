@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+# Ignore environment variable files
+.env
+
+# Bytecode
+__pycache__/
+*.py[cod]
+
+# SQLite database
+db.sqlite3

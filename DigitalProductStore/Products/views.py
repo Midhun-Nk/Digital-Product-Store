@@ -31,4 +31,5 @@ def list_product(request):
 def detail_product(request, pk):
     product = get_object_or_404(ProductModels, pk=pk)
     context = {'product': product}
+    print(product.url)
     return render(request, 'product_details.html', context)

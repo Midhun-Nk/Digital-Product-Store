@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-
+from decouple import config
+import ssl
+import certifi
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,7 +43,8 @@ INSTALLED_APPS = [
     'Customers',
     'Orders',
     'Products',
-    'Themes'
+    'Themes',
+    'Seller'
     
 ]
 
@@ -134,3 +137,17 @@ MEDIA_ROOT=os.path.join(BASE_DIR,'media/')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Email configuration via SendGrid
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
+# Fix SSL on some platforms (like Windows with SendGrid)
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+ssl._create_default_https_context = lambda: ssl_context

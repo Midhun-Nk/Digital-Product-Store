@@ -1,6 +1,6 @@
 from django.db import models
 
-from Customers.models import SellerModels
+from Seller.models import SellerModels
 
 class ProductModels(models.Model):
      LIVE=1
@@ -16,6 +16,8 @@ class ProductModels(models.Model):
      created_at=models.DateTimeField(auto_now_add=True)
      updated_at=models.DateTimeField(auto_now=True)
      seller = models.ForeignKey(SellerModels, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
+     # 🆕 New field for digital product URL
+     url = models.URLField(max_length=500, blank=True, null=True, help_text="Enter download or access link")
 
      def __str__(self)->str:
           return self.title

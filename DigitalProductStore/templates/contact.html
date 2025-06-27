@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div
+  class="small-container"
+  style="max-width: 800px; margin: 60px auto; padding: 20px"
+>
+  <h2 style="text-align: center; margin-bottom: 20px">Contact Us</h2>
+  <hr style="margin-bottom: 30px" />
+
+  <p style="font-size: 18px; line-height: 1.8">
+    Have a question, feedback, or need support? We're here to help. At
+    <strong>DigitalCart</strong>, we value every interaction with our community.
+    Reach out to us using the details below or send us a message using the
+    contact form.
+  </p>
+
+  <div style="margin-top: 30px">
+    <h4>📧 Email</h4>
+    <p style="font-size: 16px">midhunnk2019@gmail.com</p>
+
+    <h4>📍 Location</h4>
+    <p style="font-size: 16px">Kerala, India</p>
+
+    <h4>📞 Phone</h4>
+    <p style="font-size: 16px">+91 98765 43210</p>
+  </div>
+
+  <hr style="margin: 40px 0" />
+
+  <h4>Send us a message</h4>
+  <form method="POST" style="margin-top: 20px">
+    {% csrf_token %}
+    <label>Your Name</label><br />
+    <input
+      type="text"
+      name="name"
+      placeholder="Enter your name"
+      required
+      style="width: 100%; padding: 10px"
+    /><br /><br />
+
+    <label>Your Email</label><br />
+    <input
+      type="email"
+      name="email"
+      placeholder="Enter your email"
+      required
+      style="width: 100%; padding: 10px"
+    /><br /><br />
+
+    <label>Your Message</label><br />
+    <textarea
+      name="message"
+      rows="5"
+      placeholder="Write your message here..."
+      required
+      style="width: 100%; padding: 10px"
+    ></textarea
+    ><br /><br />
+
+    <button type="submit" class="btn">Send Message</button>
+  </form>
+</div>
+{% endblock %}

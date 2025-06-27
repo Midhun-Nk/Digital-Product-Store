@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="small-container" style="margin: 40px auto; max-width: 1000px">
+  <h2>Your Products</h2>
+
+  {% if products %}
+  <div class="row">
+    {% for product in products %}
+    <div class="col-4" style="margin-bottom: 30px; padding: 10px">
+      <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px">
+        <img
+          src="{{ product.image.url }}"
+          style="width: 100%; height: 200px; object-fit: cover"
+          alt="{{ product.title }}"
+        />
+        <h4>{{ product.title }}</h4>
+        <p>₹{{ product.price }}</p>
+        <p style="color: gray">Category: {{ product.category }}</p>
+        <p style="font-size: 14px">
+          {{ product.description|truncatechars:100 }}
+        </p>
+        <p><strong>Priority:</strong> {{ product.priority }}</p>
+
+        <form method="POST" action="{% url 'delete_product' product.id %}">
+          {% csrf_token %}
+          <button
+            type="submit"
+            style="
+              margin-top: 10px;
+              color: white;
+              background-color: red;
+              border: none;
+              padding: 8px 12px;
+              cursor: pointer;
+            "
+          >
+            🗑️ Remove
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>You haven’t added any products yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

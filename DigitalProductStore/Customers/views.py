@@ -6,13 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from .models import CustomerModels
-from .models import SellerModels  # ✅ Import your seller model
+from Seller.models import SellerModels  # ✅ Import your seller model
 from Products.models import ProductModels
 
 
 def user_logout(request):
     logout(request)
-    return redirect('Home')
+    return redirect('home')
 
 
 def show_account(request):
@@ -40,7 +40,7 @@ def show_account(request):
                     phone=phone,
                     address=address
                 )
-                return redirect('Home')
+                return redirect('home')
 
             # ✅ Login Logic
             elif 'login' in request.POST:
@@ -49,7 +49,7 @@ def show_account(request):
                 user = authenticate(request, username=username, password=password)
                 if user:
                     login(request, user)
-                    return redirect('Home')
+                    return redirect('home')
                 else:
                     error = "Invalid username or password."
 
@@ -60,63 +60,8 @@ def show_account(request):
 
     return render(request, 'acount.html', {"error": error})
 
+def about_page(request):
+    return render(request, 'about.html')
 
-@login_required
-def seller_panel(request):
-    user = request.user
-
-    if hasattr(user, 'seller_profile'):
-        return redirect('seller_dashboard')
-
-    if request.method == 'POST':
-        # Optional: Add shop name / address here
-        shop_name = request.POST.get('shop_name', f"{user.username}'s Shop")
-        shop_address = request.POST.get('shop_address', 'Not provided')
-
-        SellerModels.objects.create(
-            user=user,
-            shop_name=shop_name,
-            shop_address=shop_address
-        )
-
-        messages.success(request, "You are now a seller!")
-        return redirect('seller_dashboard')
-
-    return render(request, 'become_seller.html')
-
-
-@login_required
-def seller_dashboard(request):
-    return render(request, 'seller_dashboard.html')
-
-
-@login_required
-def add_product(request):
-    if not hasattr(request.user, 'seller_profile'):
-        messages.error(request, "You must become a seller first.")
-        return redirect('seller_panel')
-
-    if request.method == "POST":
-        try:
-            title = request.POST['title']
-            price = float(request.POST['price'])
-            description = request.POST['description']
-            category = request.POST['category']
-            priority = int(request.POST.get('priority', 0))
-            image = request.FILES['image']
-
-            ProductModels.objects.create(
-                title=title,
-                price=price,
-                description=description,
-                category=category,
-                priority=priority,
-                image=image,
-                seller=request.user.seller_profile
-            )
-
-            return render(request, 'add_product.html', {'success': "Product added successfully!"})
-        except Exception as e:
-            return render(request, 'add_product.html', {'error': str(e)})
-
-    return render(request, 'add_product.html')
+def contact_page(request):
+    return render(request, 'contact.html')
