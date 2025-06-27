@@ -1,5 +1,7 @@
 from django.db import models
 
+from Customers.models import SellerModels
+
 class ProductModels(models.Model):
      LIVE=1
      DELETE=0
@@ -13,6 +15,7 @@ class ProductModels(models.Model):
      delete_status=models.IntegerField(choices=DELETE_CHOICE,default=LIVE)
      created_at=models.DateTimeField(auto_created=True)
      updated_at=models.DateTimeField(auto_now=True)
+     seller = models.ForeignKey(SellerModels, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
 
      def __str__(self)->str:
           return self.title

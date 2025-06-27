@@ -1,0 +1,37 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="small-container" style="max-width: 600px; margin: 40px auto">
+  <h2>Become a Seller</h2>
+  <p>
+    Interested in selling your products? Fill in your shop details to get
+    started.
+  </p>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <label for="shop_name"><strong>Shop Name:</strong></label
+    ><br />
+    <input
+      type="text"
+      id="shop_name"
+      name="shop_name"
+      placeholder="Eg: Midhun Store"
+      required
+      style="width: 100%; padding: 10px; margin-bottom: 15px"
+    />
+
+    <label for="shop_address"><strong>Shop Address:</strong></label
+    ><br />
+    <input
+      type="text"
+      id="shop_address"
+      name="shop_address"
+      placeholder="Eg: Kochi, Kerala"
+      required
+      style="width: 100%; padding: 10px; margin-bottom: 20px"
+    />
+
+    <button type="submit" class="btn">Become a Seller</button>
+  </form>
+</div>
+{% endblock %}

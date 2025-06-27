@@ -1,28 +1,45 @@
 {% load static %}
 
 <div class="navbar">
-    <div class="logo">
-        <a href="{% url 'home' %}"><img src="{% static 'images/logo.png' %}" alt="RedStore Logo" width="125px"></a>
-    </div>
+  <div class="logo">
+    <a href="{% url 'home' %}"
+      ><img
+        src="{% static 'images/logo.png' %}"
+        alt="RedStore Logo"
+        width="125px"
+    /></a>
+  </div>
 
-    <nav>
-        <ul id="MenuItems">
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'products' %}">Products</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+  <nav>
+    <ul id="MenuItems">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'products' %}">Products</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
 
-            {% if user.is_authenticated %}
-                <li><a href="{% url 'logout' %}">Logout</a></li>
-            {% else %}
-                <li><a href="{% url 'account' %}">Login</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+      {% if user.is_authenticated %}
+      <li><a href="{% url 'logout' %}">Logout</a></li>
+      <li><a href="{% url 'seller_panel' %}">Seller Panel</a></li>
 
-    <a href="{% url 'view_cart' %}">
-        <img src="{% static 'images/cart.png' %}" alt="Cart" width="30px" height="30px">
-    </a>
+      {% else %}
+      <li><a href="{% url 'account' %}">Login</a></li>
+      {% endif %}
+    </ul>
+  </nav>
 
-    <img src="{% static 'images/menu.png' %}" class="menu-icon" alt="Menu" onclick="menutoggle()">
+  <a href="{% url 'view_cart' %}">
+    <img
+      src="{% static 'images/cart.png' %}"
+      alt="Cart"
+      width="30px"
+      height="30px"
+    />
+  </a>
+
+  <img
+    src="{% static 'images/menu.png' %}"
+    class="menu-icon"
+    alt="Menu"
+    onclick="menutoggle()"
+  />
 </div>
