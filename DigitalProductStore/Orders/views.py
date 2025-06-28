@@ -111,136 +111,56 @@ def remove_cart_item(request, item_id):
 
 
 @login_required
-def confirmed_orders(request):
-    customer = request.user.customer_profile
-    orders = Order.objects.filter(owner=customer, order_status=Order.ORDER_CONFIRMED, delete_status=Order.LIVE)
-    return render(request, 'confirmed_orders.html', {'orders': orders})
+def order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id, owner=request.user.customer_profile)
+
+    items = []
+    for item in order.ordered_items.select_related('product'):
+        total = item.quantity * item.product.price if item.product else 0
+        items.append({
+            'item': item,
+            'total': total
+        })
+
+    return render(request, 'order_status.html', {
+        'order': order,
+        'items': items
+    })
 
 @require_POST
 @login_required
-def confirm_order(request):
-    customer = request.user.customer_profile
-    try:
-        # Get the active cart order
-        order = Order.objects.get(owner=customer, order_status=Order.CART_STAGE, delete_status=Order.LIVE)
 
-        # Confirm the order
+def confirm_order(request):
+    user = request.user
+    customer = getattr(user, 'customer_profile', None)
+
+    if not customer:
+        return redirect('view_cart')
+
+    try:
+        order = Order.objects.get(
+            owner=customer,
+            order_status=Order.CART_STAGE,
+            delete_status=Order.LIVE
+        )
+
+        # Update order status
         order.order_status = Order.ORDER_CONFIRMED
         order.save()
 
-        # Prepare download links
-        product_links = []
-        for item in order.ordered_items.select_related('product'):
-            if item.product and item.product.url:
-                product_links.append(
-                    f"<li><strong>{item.product.title}:</strong> <a href='{item.product.url}'>{item.product.url}</a></li>"
-                )
-
-                # Compose email HTML content
-                html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <style>
-            body {{
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f7f9fc;
-            padding: 40px 20px;
-            color: #333;
-            }}
-            .container {{
-            max-width: 700px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            }}
-            .header {{
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #eee;
-            }}
-            .header h1 {{
-            color: #2c3e50;
-            }}
-            .product {{
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            }}
-            .product h3 {{
-            margin: 0 0 10px 0;
-            color: #007bff;
-            }}
-            .footer {{
-            margin-top: 40px;
-            font-size: 14px;
-            color: #555;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            text-align: center;
-            }}
-            a {{
-            color: #1a73e8;
-            }}
-        </style>
-        </head>
-        <body>
-        <div class="container">
-            <div class="header">
-            <h1>🎉 Thanks for your Purchase!</h1>
-            <p>Your digital products are ready for download below.</p>
-            </div>
-        """
-
-        # Add product blocks
-        for item in order.ordered_items.select_related('product'):
-            product = item.product
-            if product:
-                html_content += f"""
-                <div class="product">
-                <h3>{product.title}</h3>
-                <p><strong>Price:</strong> ₹{product.price}</p>
-                <p><strong>Description:</strong> {product.description}</p>
-                <p><strong>Category:</strong> {product.category}</p>
-                <p><strong>Quantity Ordered:</strong> {item.quantity}</p>
-                <p><strong>Download Link:</strong> <a href="{product.url}">{product.url}</a></p>
-                </div>
-                """
-
-        # Close HTML
-        html_content += """
-            <div class="footer">
-            <p>If you have any questions, reply to this email or contact support.</p>
-            <p>💼 DigitalProductStore<br>📧 midhunnk2019@gmail.com</p>
-            </div>
-        </div>
-        </body>
-        </html>
-        """
-
-
-
-               # Send the email
-        message = Mail(
-            from_email=config('DEFAULT_FROM_EMAIL'),
-            to_emails=request.user.email,
-            subject='Your Digital Product Download Links',
-            html_content=html_content
-        )
-
-        SENDGRID_API_KEY = config('SENDGRID_API_KEY')
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        print("SendGrid response status:", response.status_code)
-
-
     except Order.DoesNotExist:
-        pass
-    except Exception as e:
-        print("SendGrid error:", e)
+        return redirect('view_cart')
 
     return redirect('confirmed_orders')
+
+@login_required
+def confirmed_orders(request):
+    customer = request.user.customer_profile
+
+    orders = Order.objects.filter(
+        owner=customer,
+        order_status__in=[Order.ORDER_CONFIRMED, Order.ORDER_PROCESSED, Order.ORDER_REJECTED],
+        delete_status=Order.LIVE
+    ).order_by('-created_at')
+
+    return render(request, 'confirmed_orders.html', {'orders': orders})

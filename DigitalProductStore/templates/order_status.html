@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% block content %}
+<div
+  class="small-container"
+  style="max-width: 900px; margin: auto; margin-top: 40px"
+>
+  <h2>🧾 Your Order Summary</h2>
+  <p style="color: #555">
+    Thank you for your purchase! Your products are being approved by the seller.
+  </p>
+
+  <!-- Order Status -->
+  <!-- Order Status -->
+  <div style="margin-top: 20px">
+    <p>
+      <strong>Status:</strong>
+      {% if order.order_status == 1 %}
+      <span class="badge bg-warning">⏳ Pending</span>
+      {% elif order.order_status == 2 %}
+      <span class="badge bg-success">✅ Processed</span>
+      {% else %}
+      <span class="badge bg-danger">❌ Rejected</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Product Items -->
+  {% for entry in items %} {% with item=entry.item total=entry.total %}
+  <div
+    style="
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+    "
+  >
+    <!-- Product Image -->
+    <img
+      src="{{ item.product.image.url }}"
+      alt="{{ item.product.title }}"
+      width="100"
+      height="100"
+      style="object-fit: cover; border-radius: 8px"
+    />
+
+    <!-- Product Info -->
+    <div>
+      <h4>{{ item.product.title }}</h4>
+      <p><strong>Price:</strong> ₹{{ item.product.price }}</p>
+      <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+      <p><strong>Total:</strong> ₹{{ total|floatformat:2 }}</p>
+    </div>
+  </div>
+  {% endwith %} {% endfor %}
+</div>
+{% endblock %}

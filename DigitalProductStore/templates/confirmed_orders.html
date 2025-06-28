@@ -1,29 +1,51 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "base.html" %} {% block content %}
+<div
+  class="small-container"
+  style="max-width: 900px; margin: auto; margin-top: 40px"
+>
+  <h2>📦 My Orders</h2>
 
-{% block content %}
-<div class="small-container">
-    <h2>Your Confirmed Orders</h2>
+  {% if orders %} {% for order in orders %}
+  <div
+    style="
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    "
+  >
+    <h4>Order ID: {{ order.id }}</h4>
+    <p>
+      <strong>Status:</strong>
+      {% if order.order_status == 1 %}
+      <span style="color: orange">⏳ Pending Seller Approval</span>
+      {% elif order.order_status == 2 %}
+      <span style="color: green">✅ Approved</span>
+      {% endif %}
+    </p>
+    <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y, g:i a" }}</p>
 
-    {% if orders %}
-        {% for order in orders %}
-            <div class="order-card" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;">
-                <h4>Order ID: {{ order.id }}</h4>
-                <p>Status: {{ order.get_order_status_display }}</p>
-                <p>Date: {{ order.created_at|date:"F j, Y, g:i a" }}</p>
-                <ul>
-                    {% for item in order.ordered_items.all %}
-                        <li>
-                            {{ item.quantity }} × {{ item.product.title }} (₹{{ item.product.price }})  
-                            = ₹{{ item.quantity|floatformat:0|add:"0"|add:"0" }} × ₹{{ item.product.price|floatformat:0 }}
-                            = ₹{{ item.product.price|floatformat:2|floatformat:2|stringformat:"s" }} × {{ item.quantity }} 
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>You have no confirmed orders yet.</p>
-    {% endif %}
+    <ul style="list-style: none; padding-left: 0">
+      {% for item in order.ordered_items.all %}
+      <li style="margin-bottom: 10px">
+        <img
+          src="{{ item.product.image.url }}"
+          width="60"
+          style="vertical-align: middle; border-radius: 6px"
+        />
+        <strong>{{ item.product.title }}</strong> × {{ item.quantity }} = ₹{{
+        item.quantity|add:"0" }} × ₹{{ item.product.price }}<br />
+        {% if order.order_status == 2 %}
+        <a href="{{ item.product.url }}" target="_blank" style="color: #007bff"
+          >📥 Download</a
+        >
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %} {% else %}
+  <p>You haven't placed any orders yet.</p>
+  {% endif %}
 </div>
 {% endblock %}

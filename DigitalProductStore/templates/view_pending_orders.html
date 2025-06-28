@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block content %}
+<h2 style="margin-bottom: 30px">🕒 Pending Orders</h2>
+
+{% for order in orders %}
+<div
+  style="
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fefefe;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+  "
+>
+  <!-- Left: Products -->
+  <div style="flex: 2">
+    <h4 style="margin-bottom: 10px">📦 Products</h4>
+    {% for item in order.ordered_items.all %} {% if item.product %}
+    <div
+      style="
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+      "
+    >
+      <img
+        src="{{ item.product.image.url }}"
+        width="100"
+        height="100"
+        alt="{{ item.product.title }}"
+        style="object-fit: cover; border-radius: 5px"
+      />
+      <div>
+        <p><strong>Title:</strong> {{ item.product.title }}</p>
+        <p><strong>Category:</strong> {{ item.product.category }}</p>
+        <p><strong>Price:</strong> ₹{{ item.product.price }}</p>
+        <p><strong>Qty:</strong> {{ item.quantity }}</p>
+        <p>
+          <strong>Download:</strong>
+          <a href="{{ item.product.url }}" target="_blank">Link</a>
+        </p>
+      </div>
+    </div>
+    {% endif %} {% endfor %}
+  </div>
+
+  <!-- Right: Customer & Action -->
+  <div style="flex: 1; border-left: 2px dashed #ddd; padding-left: 20px">
+    <h4 style="margin-bottom: 10px">👤 Customer</h4>
+    <p><strong>Name:</strong> {{ order.owner.name }}</p>
+    <p><strong>Email:</strong> {{ order.owner.user.email }}</p>
+    <p><strong>Address:</strong> {{ order.owner.address }}</p>
+    <p>
+      <strong>Joined:</strong> {{ order.owner.user.date_joined|date:"d M Y" }}
+    </p>
+
+    <div style="margin-top: 20px">
+      <form
+        method="post"
+        action="{% url 'approve_order' order.id %}"
+        style="display: inline-block"
+      >
+        {% csrf_token %}
+        <button
+          type="submit"
+          style="
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+          "
+        >
+          ✅ Approve
+        </button>
+      </form>
+
+      <form
+        method="post"
+        action="{% url 'reject_order' order.id %}"
+        style="display: inline-block; margin-left: 10px"
+      >
+        {% csrf_token %}
+        <button
+          type="submit"
+          style="
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+          "
+        >
+          ❌ Cancel
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% empty %}
+<p>No pending orders.</p>
+{% endfor %} {% endblock %}

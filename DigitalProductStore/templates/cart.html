@@ -1,7 +1,135 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="small-container cart-page">
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in items %}
+      <tr>
+        <td>
+          <div class="cart-info">
+            <img
+              src="{{ entry.item.product.image.url }}"
+              alt="{{ entry.item.product.title }}"
+            />
+            <div>
+              <p>{{ entry.item.product.title }}</p>
+              <small>Price: ₹{{ entry.item.product.price }}</small><br />
 
+              <!-- 🗑️ Remove Button -->
+              <form
+                method="POST"
+                action="{% url 'remove_cart_item' entry.item.id %}"
+              >
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  style="
+                    color: red;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                  "
+                >
+                  Remove
+                </button>
+              </form>
+            </div>
+          </div>
+        </td>
 
-{% block content %}
-{% include 'cart_container.html' %}
+        <!-- ➕➖ Quantity Update Buttons -->
+        <td>
+          <form
+            method="POST"
+            action="{% url 'update_cart_quantity' entry.item.id %}"
+            style="display: flex; align-items: center; gap: 5px"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              name="action"
+              value="decrease"
+              style="padding: 2px 8px"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              name="quantity"
+              value="{{ entry.item.quantity }}"
+              min="1"
+              readonly
+              style="width: 40px; text-align: center"
+            />
+            <button
+              type="submit"
+              name="action"
+              value="increase"
+              style="padding: 2px 8px"
+            >
+              +
+            </button>
+          </form>
+        </td>
 
-{% endblock content %}
+        <!-- 💰 Subtotal -->
+        <td>₹{{ entry.subtotal }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">Your cart is empty.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- 💵 Totals Section -->
+  <div class="total-price">
+    <table>
+      <tr>
+        <td>Subtotal</td>
+        <td>₹{{ subtotal }}</td>
+      </tr>
+      <tr>
+        <td>Tax</td>
+        <td>₹{{ tax|floatformat:2 }}</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td>₹{{ total|floatformat:2 }}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right">
+          <form method="POST" action="{% url 'confirm_order' %}">
+            {% csrf_token %}
+            <button class="btn" type="submit">Confirm</button>
+          </form>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 📁 View My Orders Button -->
+  <div style="text-align: right; margin-top: 20px">
+    <a
+      href="{% url 'confirmed_orders' %}"
+      class="btn"
+      style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+      "
+    >
+      📁 View My Orders
+    </a>
+  </div>
+</div>
+{% endblock %}

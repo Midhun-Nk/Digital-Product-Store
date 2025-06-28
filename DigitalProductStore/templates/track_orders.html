@@ -1,0 +1,37 @@
+{% extends "base.html" %} {% block content %}
+<div class="small-container" style="margin: 40px auto; max-width: 800px">
+  <h2 style="margin-bottom: 20px">📊 Track Your Orders</h2>
+
+  <p style="color: #555">
+    Here you can see the status of all confirmed orders placed for your
+    products.
+  </p>
+
+  <table style="width: 100%; margin-top: 30px; border-collapse: collapse">
+    <thead>
+      <tr style="background-color: #f2f2f2">
+        <th style="padding: 10px; text-align: left">Order ID</th>
+        <th style="padding: 10px; text-align: left">Product</th>
+        <th style="padding: 10px; text-align: left">Quantity</th>
+        <th style="padding: 10px; text-align: left">Customer</th>
+        <th style="padding: 10px; text-align: left">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %} {% for item in order.ordered_items.all %}
+      <tr>
+        <td style="padding: 8px">{{ order.id }}</td>
+        <td style="padding: 8px">{{ item.product.title }}</td>
+        <td style="padding: 8px">{{ item.quantity }}</td>
+        <td style="padding: 8px">{{ order.owner.user.username }}</td>
+        <td style="padding: 8px">{{ order.updated_at|date:"M d, Y" }}</td>
+      </tr>
+      {% endfor %} {% empty %}
+      <tr>
+        <td colspan="5" style="padding: 10px">No orders found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
