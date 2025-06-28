@@ -13,7 +13,7 @@ def index(request):
 
 def list_product(request):
     products_list = ProductModels.objects.order_by('-priority')
-    product_paginator = Paginator(products_list, 2)  # 2 products per page
+    product_paginator = Paginator(products_list, 3)  # 2 products per page
     page = request.GET.get('page', 1)
     page_obj = product_paginator.get_page(page)
 
